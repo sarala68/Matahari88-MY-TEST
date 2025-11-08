@@ -159,6 +159,12 @@
 </head>
 <body>
 
+<!-- Background Audio -->
+<audio id="backgroundMusic">
+  <source src="audio/background.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
 <div class="header">
   <h2>Order Your Matahari Products</h2>
 </div>
@@ -172,6 +178,7 @@
 </div>
 
 <div class="container">
+  <!-- Products (unchanged) -->
   <div class="product">
     <img src="images/product1.jpg" alt="Floor Cleaner Lavender">
     <h3>Floor Cleaner Lavender</h3>
@@ -183,9 +190,9 @@
       <option value="49.90">10L Jerry Can - RM 49.90</option>
     </select>
     <div class="quantity-control">
-      <button onclick="changeQty(this, -1)">-</button>
+      <button type="button" onclick="changeQty(this, -1)">-</button>
       <input type="number" value="0" min="0" data-id="1" oninput="updateTotal()">
-      <button onclick="changeQty(this, 1)">+</button>
+      <button type="button" onclick="changeQty(this, 1)">+</button>
     </div>
   </div>
 
@@ -195,9 +202,9 @@
     <p>Refreshing sandalwood scent with deep cleaning formula for a spotless finish.</p>
     <label>Price: RM 17.90</label>
     <div class="quantity-control">
-      <button onclick="changeQty(this, -1)">-</button>
+      <button type="button" onclick="changeQty(this, -1)">-</button>
       <input type="number" value="0" min="0" data-id="4" oninput="updateTotal()">
-      <button onclick="changeQty(this, 1)">+</button>
+      <button type="button" onclick="changeQty(this, 1)">+</button>
     </div>
   </div>
 
@@ -212,9 +219,9 @@
       <option value="49.90">10L Jerry Can - RM 49.90</option>
     </select>
     <div class="quantity-control">
-      <button onclick="changeQty(this, -1)">-</button>
+      <button type="button" onclick="changeQty(this, -1)">-</button>
       <input type="number" value="0" min="0" data-id="5" oninput="updateTotal()">
-      <button onclick="changeQty(this, 1)">+</button>
+      <button type="button" onclick="changeQty(this, 1)">+</button>
     </div>
   </div>
 
@@ -229,9 +236,9 @@
       <option value="32.90">10L Jerry Can – RM 32.90</option>
     </select>
     <div class="quantity-control">
-      <button onclick="changeQty(this, -1)">-</button>
+      <button type="button" onclick="changeQty(this, -1)">-</button>
       <input type="number" value="0" min="0" data-id="6" oninput="updateTotal()">
-      <button onclick="changeQty(this, 1)">+</button>
+      <button type="button" onclick="changeQty(this, 1)">+</button>
     </div>
   </div>
 </div>
@@ -369,9 +376,17 @@ function sendOrder() {
   });
 
   const message = `Hello, I would like to order:%0A%0A${productList}%0ATotal: RM ${total}%0A(Exclude Delivery)%0A%0AName: ${name}%0APhone: ${phone}`;
-  const whatsappLink = `https://wa.me/60173328477?text=${message}`;
+  const whatsappLink = `https://wa.me/60173328477?text=${encodeURIComponent(message)}`;
   window.open(whatsappLink, '_blank');
 }
+
+// Play background music only once on first click
+document.addEventListener('DOMContentLoaded', () => {
+  const audio = document.getElementById('backgroundMusic');
+  document.body.addEventListener('click', () => {
+    audio.play();
+  }, { once: true });
+});
 </script>
 </body>
 </html>
