@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Order Your Matahari Products</title>
 <link rel="icon" type="image/png" href="images/favicon.png" sizes="96x96">
-<link rel="shortcut icon" type="image/png" href="images/favicon.png" sizes="96x96">
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -131,7 +130,7 @@
   }
   .popup-content h3 { color: #25D366; text-align: center; margin-bottom: 15px; }
   .popup-content ul { list-style: none; padding: 0; margin: 0 0 15px; }
-  .popup-content li { margin-bottom: 8px; color: #fff; }
+  .popup-content li { margin-bottom: 8px; color: #fff; white-space: pre-line; }
   .popup-buttons {
     display: flex;
     justify-content: space-between;
@@ -159,7 +158,6 @@
 </head>
 <body>
 
-<!-- Background Audio -->
 <audio id="backgroundMusic">
   <source src="audio/background.mp3" type="audio/mpeg">
   Your browser does not support the audio element.
@@ -178,7 +176,7 @@
 </div>
 
 <div class="container">
-  <!-- Products (unchanged) -->
+  <!-- Products -->
   <div class="product">
     <img src="images/product1.jpg" alt="Floor Cleaner Lavender">
     <h3>Floor Cleaner Lavender</h3>
@@ -258,7 +256,6 @@
   <div class="popup-content">
     <h3>Order Summary</h3>
     <ul id="orderList"></ul>
-    <p><strong>Total: RM <span id="popupTotal">0.00</span></strong></p>
     <div class="popup-buttons">
       <button class="cancel-btn" onclick="cancelOrder()">Cancel</button>
       <button class="proceed-btn" onclick="sendOrder()">Proceed</button>
@@ -302,10 +299,7 @@ function validateForm() {
   remark.style.visibility = valid ? 'hidden' : 'visible';
 }
 
-function showPopup() {
-  const total = document.getElementById('totalAmount').textContent;
-  const orderList = document.getElementById('orderList');
-  orderList.innerHTML = '';
+function getOrderDetails() {
   const products = [
     { name: 'Floor Cleaner Lavender', comboId: 'combo1', qty: document.querySelector('[data-id="1"]').value },
     { name: 'Floor Cleaner Honey Dew', comboId: 'combo5', qty: document.querySelector('[data-id="5"]').value },
@@ -313,12 +307,12 @@ function showPopup() {
     { name: 'Floor Cleaner Sandalwood', fixedPrice: 17.90, qty: document.querySelector('[data-id="4"]').value }
   ];
 
+  let orderLines = '';
   products.forEach(p => {
     const qty = parseInt(p.qty);
     if (qty > 0) {
       let comboText = '';
       let priceText = '';
-
       if (p.comboId) {
         const selected = document.getElementById(p.comboId).selectedOptions[0];
         const parts = selected.text.split(/\s[-–]\s/);
@@ -327,13 +321,24 @@ function showPopup() {
       } else {
         priceText = `RM ${p.fixedPrice.toFixed(2)}`;
       }
-      const li = document.createElement('li');
-      li.textContent = `${p.name} ${comboText ? '(' + comboText + ')' : ''} - ${priceText} (x${qty})`;
-      orderList.appendChild(li);
+      orderLines += `- ${p.name} ${comboText ? '(' + comboText + ')' : ''} - ${priceText} (x${qty})\n`;
     }
   });
 
-  document.getElementById('popupTotal').textContent = total;
+  const total = document.getElementById('totalAmount').textContent;
+  orderLines += `\nTotal: RM ${total}\n(Exclude Delivery)\n`; // spacing before total
+  return { orderLines, total };
+}
+
+function showPopup() {
+  const { orderLines } = getOrderDetails();
+  const orderList = document.getElementById('orderList');
+  orderList.innerHTML = '';
+  orderLines.split('\n').forEach(line => {
+    const li = document.createElement('li');
+    li.textContent = line || ' '; // preserve empty lines
+    orderList.appendChild(li);
+  });
   document.getElementById('orderPopup').style.display = 'flex';
 }
 
@@ -344,49 +349,22 @@ function cancelOrder() {
 }
 
 function sendOrder() {
-  document.getElementById('orderPopup').style.display = 'none';
   const name = document.getElementById('name').value.trim();
   const phone = document.getElementById('phone').value.trim();
-  const total = document.getElementById('totalAmount').textContent;
+  const { orderLines } = getOrderDetails();
 
-  const products = [
-    { name: 'Floor Cleaner Lavender', comboId: 'combo1', qty: document.querySelector('[data-id="1"]').value },
-    { name: 'Floor Cleaner Honey Dew', comboId: 'combo5', qty: document.querySelector('[data-id="5"]').value },
-    { name: 'Lemon Fresh Dishwash', comboId: 'combo6', qty: document.querySelector('[data-id="6"]').value },
-    { name: 'Floor Cleaner Sandalwood', fixedPrice: 17.90, qty: document.querySelector('[data-id="4"]').value }
-  ];
-
-  let productList = '';
-  products.forEach(p => {
-    const qty = parseInt(p.qty);
-    if (qty > 0) {
-      let comboText = '';
-      let priceText = '';
-      if (p.comboId) {
-        const selected = document.getElementById(p.comboId).selectedOptions[0];
-        const parts = selected.text.split(/\s[-–]\s/);
-        comboText = parts[0];
-        priceText = parts[1];
-      } else {
-        comboText = '';
-        priceText = `RM ${p.fixedPrice.toFixed(2)}`;
-      }
-      productList += `- ${p.name} ${comboText ? '(' + comboText + ')' : ''} - ${priceText} (x${qty})%0A`;
-    }
-  });
-
-  const message = `Hello, I would like to order:%0A%0A${productList}%0ATotal: RM ${total}%0A(Exclude Delivery)%0A%0AName: ${name}%0APhone: ${phone}`;
+  const message = `Hello, I would like to order:\n\n${orderLines}Name: ${name}\nPhone: ${phone}`;
   const whatsappLink = `https://wa.me/60173328477?text=${encodeURIComponent(message)}`;
   window.open(whatsappLink, '_blank');
+  document.getElementById('orderPopup').style.display = 'none';
 }
 
-// Play background music only once on first click
+// Play background music once on first click
 document.addEventListener('DOMContentLoaded', () => {
   const audio = document.getElementById('backgroundMusic');
-  document.body.addEventListener('click', () => {
-    audio.play();
-  }, { once: true });
+  document.body.addEventListener('click', () => { audio.play(); }, { once: true });
 });
 </script>
+
 </body>
 </html>
