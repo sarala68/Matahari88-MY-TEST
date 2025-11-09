@@ -326,7 +326,7 @@ function getOrderDetails() {
   });
 
   const total = document.getElementById('totalAmount').textContent;
-  orderLines += `\nTotal: RM ${total}\n(Exclude Delivery)\n`; // spacing before total
+  orderLines += `\nTotal: RM ${total}\n(Exclude Delivery)\n`;
   return { orderLines, total };
 }
 
@@ -336,7 +336,7 @@ function showPopup() {
   orderList.innerHTML = '';
   orderLines.split('\n').forEach(line => {
     const li = document.createElement('li');
-    li.textContent = line || ' '; // preserve empty lines
+    li.textContent = line || ' ';
     orderList.appendChild(li);
   });
   document.getElementById('orderPopup').style.display = 'flex';
@@ -352,9 +352,8 @@ function sendOrder() {
   const name = document.getElementById('name').value.trim();
   const phone = document.getElementById('phone').value.trim();
   const { orderLines } = getOrderDetails();
-
   const message = `Hello, I would like to order:\n\n${orderLines}Name: ${name}\nPhone: ${phone}`;
-  const whatsappLink = `https://wa.me/60173328477?text=${encodeURIComponent(message)}`;
+  const whatsappLink = `https://wa.me/60179198477?text=${encodeURIComponent(message)}`;
   window.open(whatsappLink, '_blank');
   document.getElementById('orderPopup').style.display = 'none';
 }
@@ -363,6 +362,48 @@ function sendOrder() {
 document.addEventListener('DOMContentLoaded', () => {
   const audio = document.getElementById('backgroundMusic');
   document.body.addEventListener('click', () => { audio.play(); }, { once: true });
+});
+
+// Image switcher for Single/Twin Pack
+function switchProductImage(selectId, imgAltMap) {
+  const select = document.getElementById(selectId);
+  const img = document.querySelector(`img[alt="${imgAltMap.alt}"]`);
+  
+  select.addEventListener('change', () => {
+    const selectedText = select.selectedOptions[0].text;
+    if (selectedText.includes("Single Pack")) {
+      img.src = imgAltMap.single;
+    } else if (selectedText.includes("Twin Pack")) {
+      img.src = imgAltMap.twin;
+    } else {
+      // Optional: keep original image for 10L Jerry Can
+      img.src = imgAltMap.original;
+    }
+  });
+}
+
+// Floor Cleaner Lavender
+switchProductImage('combo1', {
+  alt: 'Floor Cleaner Lavender',
+  single: 'images/product1.jpg',
+  twin: 'images/product11.jpg',
+  original: 'images/product1.jpg'
+});
+
+// Floor Cleaner Honey Dew
+switchProductImage('combo5', {
+  alt: 'Floor Cleaner Honey Dew',
+  single: 'images/product5.jpg',
+  twin: 'images/product51.jpg',
+  original: 'images/product5.jpg'
+});
+
+// Lemon Fresh Dishwash
+switchProductImage('combo6', {
+  alt: 'Lemon Fresh Dishwash',
+  single: 'images/product6.jpg',
+  twin: 'images/product61.jpg',
+  original: 'images/product6.jpg'
 });
 </script>
 
